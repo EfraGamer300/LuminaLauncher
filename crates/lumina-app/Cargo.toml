@@ -1,0 +1,17 @@
+[package]
+name = "lumina-app"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "lumina-launcher"
+path = "src/main.rs"
+
+[dependencies]
+lumina-core = { path = "../lumina-core" }
+slint = { version = "1.18", features = ["backend-winit", "renderer-femtovg"] }
+rfd = "0.17"
+
+[build-dependencies]
+slint-build = "1.18"

@@ -1,0 +1,1218 @@
+// Lumina Launcher — warm graphite / solar amber
+// Direction: "light in the dark". Near-black warm graphite surfaces,
+// ivory type, a single solar-amber accent reserved for the launch orb.
+
+component MicroLabel inherits Text {
+    in property <string> label: "";
+
+    text: root.label;
+    color: #85887C;
+    font-size: 10px;
+    font-family: "Segoe UI";
+    font-weight: 600;
+    letter-spacing: 1.7px;
+}
+
+component Hairline inherits Rectangle {
+    height: 1px;
+    background: #24271F;
+}
+
+component LogoMark inherits Rectangle {
+    width: 28px;
+    height: 28px;
+    border-radius: 14px;
+    background: @linear-gradient(135deg, #FFD08A 0%, #F4B860 48%, #B86E2E 100%);
+
+    Rectangle {
+        x: 9px;
+        y: -3px;
+        width: 24px;
+        height: 24px;
+        border-radius: 12px;
+        background: #0C0D0B;
+    }
+}
+
+component WindowButton inherits Rectangle {
+    in property <string> label: "";
+    in property <string> accessible-name: "";
+    in property <bool> danger: false;
+    callback clicked();
+
+    accessible-role: button;
+    accessible-label: root.accessible-name != "" ? root.accessible-name : root.label;
+    accessible-action-default => { root.clicked(); }
+
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: touch.has-hover ? (root.danger ? #E07A5F66 : #3A3E33) : #262A22;
+    background: touch.has-hover ? (root.danger ? #E07A5F1F : #FFFFFF0A) : #00000000;
+
+    touch := TouchArea {
+        width: parent.width;
+        height: parent.height;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+
+    Text {
+        text: root.label;
+        color: root.danger && touch.has-hover ? #E07A5F : #A3A69A;
+        font-size: 14px;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+component PrimaryButton inherits Rectangle {
+    in property <string> label: "";
+    in property <bool> active: true;
+    callback clicked();
+
+    accessible-role: button;
+    accessible-label: root.label;
+    accessible-action-default => { root.clicked(); }
+
+    height: 38px;
+    border-radius: 10px;
+    background: !root.active ? #24271F : (touch.has-hover ? #FFD08A : #F4B860);
+
+    touch := TouchArea {
+        width: parent.width;
+        height: parent.height;
+        enabled: root.active;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+
+    Text {
+        text: root.label;
+        color: #12140F;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+component GhostButton inherits Rectangle {
+    in property <string> label: "";
+    in property <bool> active: true;
+    callback clicked();
+
+    accessible-role: button;
+    accessible-label: root.label;
+    accessible-action-default => { root.clicked(); }
+
+    height: 38px;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: touch.has-hover ? #454A3B : #2E3229;
+    background: touch.has-hover ? #FFFFFF08 : #00000000;
+
+    touch := TouchArea {
+        width: parent.width;
+        height: parent.height;
+        enabled: root.active;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+
+    Text {
+        text: root.label;
+        color: root.active ? #D8D9CF : #6F7268;
+        font-size: 12.5px;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+component Toggle inherits Rectangle {
+    in property <bool> checked: false;
+    in property <string> accessible-name: "";
+    callback toggled();
+
+    accessible-role: checkbox;
+    accessible-label: root.accessible-name;
+    accessible-checked: root.checked;
+    accessible-action-default => { root.toggled(); }
+
+    width: 42px;
+    height: 24px;
+    border-radius: 12px;
+    background: root.checked ? #F4B860 : #2A2E26;
+
+    Rectangle {
+        width: 18px;
+        height: 18px;
+        border-radius: 9px;
+        background: root.checked ? #12140F : #7E8175;
+        x: root.checked ? parent.width - self.width - 3px : 3px;
+        y: 3px;
+
+        animate x { duration: 140ms; easing: ease-out; }
+        animate background { duration: 140ms; }
+    }
+
+    TouchArea {
+        width: parent.width;
+        height: parent.height;
+        mouse-cursor: pointer;
+        clicked => { root.toggled(); }
+    }
+}
+
+component StatusRow inherits HorizontalLayout {
+    in property <string> label: "";
+    in property <string> value: "";
+    in property <bool> ok: false;
+
+    spacing: 8px;
+
+    Text {
+        text: "●";
+        color: root.ok ? #9ED67C : #6F7268;
+        font-size: 8px;
+        vertical-alignment: center;
+    }
+
+    Text {
+        text: root.label;
+        color: #85887C;
+        font-size: 12px;
+        vertical-alignment: center;
+    }
+
+    Rectangle { }
+
+    Text {
+        text: root.value;
+        color: root.ok ? #DDE6D3 : #B8BAAF;
+        font-size: 12px;
+        vertical-alignment: center;
+    }
+}
+
+component SectionLabel inherits VerticalLayout {
+    in property <string> label: "";
+
+    spacing: 8px;
+    MicroLabel { label: root.label; }
+    Hairline { }
+}
+
+component PlayIcon inherits Path {
+    viewbox-width: 14;
+    viewbox-height: 18;
+    width: 14px;
+    height: 18px;
+    commands: "M 0 0 L 14 9 L 0 18 Z";
+    fill: #12140F;
+}
+
+component TitleBar inherits Rectangle {
+    in property <string> app-name: "Lumina Launcher";
+    callback start-drag();
+    callback minimize();
+    callback close-window();
+
+    height: 52px;
+    background: #0C0D0B;
+
+    TouchArea {
+        x: 0;
+        y: 0;
+        width: parent.width;
+        height: parent.height;
+        pointer-event(event) => {
+            if (event.button == PointerEventButton.left && event.kind == PointerEventKind.down) {
+                root.start-drag();
+            }
+        }
+    }
+
+    Rectangle {
+        x: 0;
+        y: parent.height - 1px;
+        width: parent.width;
+        height: 1px;
+        background: #22251E;
+    }
+
+    HorizontalLayout {
+        padding-left: 18px;
+        padding-right: 12px;
+        spacing: 10px;
+
+        LogoMark { }
+
+        Text {
+            text: "LUMINA";
+            color: #F3F1E9;
+            font-size: 16px;
+            font-family: "Bahnschrift";
+            font-weight: 700;
+            letter-spacing: 3px;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: "LAUNCHER";
+            color: #5C5F55;
+            font-size: 9px;
+            letter-spacing: 2px;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: "· WOLFSTUDIOS";
+            color: #5C5F55;
+            font-size: 9px;
+            letter-spacing: 1.6px;
+            vertical-alignment: center;
+        }
+
+        Rectangle { }
+
+                WindowButton {
+            label: "–";
+            accessible-name: "Minimizar";
+            clicked => { root.minimize(); }
+        }
+
+        WindowButton {
+            label: "✕";
+            accessible-name: "Fechar";
+            danger: true;
+            clicked => { root.close-window(); }
+        }
+    }
+}
+
+component HomePage inherits Rectangle {
+    in property <string> status: "Preparando...";
+    in property <string> game-version: "0.0.0";
+    in property <bool> game-installed: false;
+    in property <bool> game-supported: false;
+    in property <string> launcher-version: "0.1.0";
+    in property <bool> busy: false;
+    in property <bool> injected: false;
+    in property <bool> dll-valid: false;
+    callback launch();
+    callback open-settings();
+
+    background: #0C0D0B;
+
+    // Left status panel
+    Rectangle {
+        x: 0;
+        y: 0;
+        width: 288px;
+        height: parent.height;
+        background: #10120E;
+
+        Rectangle {
+            x: parent.width - 1px;
+            y: 0;
+            width: 1px;
+            height: parent.height;
+            background: #22251E;
+        }
+
+        VerticalLayout {
+            padding: 26px;
+            spacing: 0px;
+
+            MicroLabel { label: "MINECRAFT BEDROCK"; }
+
+            Text {
+                text: root.game-installed ? root.game-version : "—";
+                color: #F3F1E9;
+                font-size: 46px;
+                font-family: "Bahnschrift";
+                font-weight: 700;
+                letter-spacing: -1px;
+            }
+
+            HorizontalLayout {
+                spacing: 7px;
+
+                Text {
+                    text: "●";
+                    color: root.game-installed ? (root.game-supported ? #9ED67C : #E07A5F) : #6F7268;
+                    font-size: 8px;
+                    vertical-alignment: center;
+                    horizontal-stretch: 0;
+                }
+
+                Text {
+                    text: root.game-installed ? (root.game-supported ? "versão suportada" : "versão não suportada") : "não instalado";
+                    color: #A3A69A;
+                    font-size: 11px;
+                    vertical-alignment: center;
+                    horizontal-stretch: 0;
+                }
+
+                Rectangle { }
+            }
+
+            Rectangle { height: 22px; }
+            Hairline { }
+            Rectangle { height: 20px; }
+
+            MicroLabel { label: "STATUS"; }
+
+            Text {
+                text: root.status;
+                color: #D8D9CF;
+                font-size: 14px;
+                wrap: word-wrap;
+            }
+
+            Rectangle { height: 20px; }
+
+            MicroLabel { label: "CLIENTE"; }
+            Rectangle { height: 8px; }
+            StatusRow {
+                label: "Injeção";
+                value: root.injected ? "ativa" : "inativa";
+                ok: root.injected;
+            }
+
+            Rectangle { height: 12px; }
+
+            MicroLabel { label: "DLL"; }
+            Rectangle { height: 8px; }
+            StatusRow {
+                label: "Arquivo";
+                value: root.dll-valid ? "válido" : "ausente";
+                ok: root.dll-valid;
+            }
+
+            Rectangle { vertical-stretch: 1; }
+
+            GhostButton {
+                label: "Configurações";
+                clicked => { root.open-settings(); }
+            }
+
+            Rectangle { height: 12px; }
+
+            HorizontalLayout {
+                Text {
+                    text: "v" + root.launcher-version;
+                    color: #5C5F55;
+                    font-size: 10px;
+                }
+                Rectangle { }
+                Text {
+                    text: "STORE UWP";
+                    color: #5C5F55;
+                    font-size: 9px;
+                    letter-spacing: 1.2px;
+                }
+            }
+
+            Text {
+                text: "Propriedade da WolfStudios";
+                color: #5C5F55;
+                font-size: 9px;
+                letter-spacing: 0.8px;
+            }
+        }
+    }
+
+    // Right launch stage
+    Rectangle {
+        x: 288px;
+        y: 0;
+        width: parent.width - 288px;
+        height: parent.height;
+        background: #00000000;
+
+        MicroLabel {
+            x: 30px;
+            y: 26px;
+            label: "PRONTO PARA INICIAR";
+        }
+
+        // soft amber glow behind the orb
+        Rectangle {
+            x: 126px;
+            y: 83px;
+            width: 260px;
+            height: 260px;
+            border-radius: 130px;
+            background: @radial-gradient(circle, #F4B8602E 0%, #F4B86000 68%);
+        }
+
+        // outer hairline ring
+        Rectangle {
+            x: 106px;
+            y: 63px;
+            width: 300px;
+            height: 300px;
+            border-radius: 150px;
+            border-width: 1px;
+            border-color: #2A2E26;
+            background: transparent;
+        }
+
+        // tick ring
+        Rectangle {
+            x: 136px;
+            y: 93px;
+            width: 240px;
+            height: 240px;
+            border-radius: 120px;
+            border-width: 1px;
+            border-color: #34382E;
+            background: transparent;
+
+            Rectangle { x: 119px; y: 0px; width: 2px; height: 6px; background: #5C604F; }
+            Rectangle { x: 119px; y: 234px; width: 2px; height: 6px; background: #5C604F; }
+            Rectangle { x: 0px; y: 119px; width: 6px; height: 2px; background: #5C604F; }
+            Rectangle { x: 234px; y: 119px; width: 6px; height: 2px; background: #5C604F; }
+            Rectangle { x: 37px; y: 37px; width: 3px; height: 3px; background: #4A4E40; }
+            Rectangle { x: 200px; y: 37px; width: 3px; height: 3px; background: #4A4E40; }
+            Rectangle { x: 37px; y: 200px; width: 3px; height: 3px; background: #4A4E40; }
+            Rectangle { x: 200px; y: 200px; width: 3px; height: 3px; background: #4A4E40; }
+        }
+
+        // launch orb
+        Rectangle {
+            x: 172px;
+            y: 129px;
+            width: 168px;
+            height: 168px;
+            border-radius: 84px;
+
+            accessible-role: button;
+            accessible-label: root.busy ? "Iniciando Minecraft" : "Iniciar Minecraft";
+            accessible-action-default => { root.launch(); }
+
+            background: root.busy
+                ? @radial-gradient(circle, #2C2F27 0%, #1E211B 100%)
+                : (touch.has-hover
+                    ? @radial-gradient(circle, #FFE0A8 0%, #FFD08A 42%, #E09A4A 100%)
+                    : @radial-gradient(circle, #FFD08A 0%, #F4B860 45%, #B86E2E 100%));
+
+            Rectangle {
+                x: 9px;
+                y: 9px;
+                width: 150px;
+                height: 150px;
+                border-radius: 75px;
+                border-width: 1px;
+                border-color: root.busy ? #3A3E33 : #FFE9BF77;
+                background: transparent;
+            }
+
+            touch := TouchArea {
+                width: parent.width;
+                height: parent.height;
+                enabled: !root.busy;
+                mouse-cursor: pointer;
+                clicked => { root.launch(); }
+            }
+
+            VerticalLayout {
+                alignment: center;
+                spacing: 9px;
+
+                HorizontalLayout {
+                    alignment: center;
+
+                    Rectangle {
+                        width: 16px;
+                        height: 20px;
+                        background: transparent;
+
+                        PlayIcon {
+                            x: 2px;
+                            y: 1px;
+                        }
+                    }
+                }
+
+                Text {
+                    text: root.busy ? "INICIANDO" : "INICIAR";
+                    color: root.busy ? #85887C : #12140F;
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 2.2px;
+                    horizontal-alignment: center;
+                }
+            }
+        }
+
+        Text {
+            x: 0;
+            y: 330px;
+            width: parent.width;
+            text: root.busy
+                ? "Preparando o Minecraft..."
+                : (root.injected ? "Cliente ativo. Minecraft pronto." : "Clique no orbe para abrir o Minecraft e injetar o cliente.");
+            color: #85887C;
+            font-size: 12px;
+            horizontal-alignment: center;
+            wrap: word-wrap;
+        }
+
+        HorizontalLayout {
+            x: 0;
+            y: 370px;
+            width: parent.width;
+            height: 18px;
+            alignment: center;
+            spacing: 18px;
+
+            HorizontalLayout {
+                spacing: 7px;
+                Text {
+                    text: "●";
+                    color: root.game-installed ? #9ED67C : #6F7268;
+                    font-size: 7px;
+                    vertical-alignment: center;
+                }
+                Text {
+                    text: root.game-installed ? "Minecraft" : "Minecraft ausente";
+                    color: #8B8E82;
+                    font-size: 10px;
+                    letter-spacing: 0.6px;
+                    vertical-alignment: center;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 7px;
+                Text {
+                    text: "●";
+                    color: root.injected ? #F4B860 : #6F7268;
+                    font-size: 7px;
+                    vertical-alignment: center;
+                }
+                Text {
+                    text: root.injected ? "Cliente injetado" : "Cliente inativo";
+                    color: #8B8E82;
+                    font-size: 10px;
+                    letter-spacing: 0.6px;
+                    vertical-alignment: center;
+                }
+            }
+        }
+    }
+}
+
+component NavButton inherits Rectangle {
+    in property <string> label: "";
+    in property <bool> selected: false;
+    in property <bool> active: true;
+    callback clicked();
+
+    accessible-role: button;
+    accessible-label: root.label;
+    accessible-action-default => { root.clicked(); }
+
+    height: 36px;
+    border-radius: 8px;
+    background: root.selected ? #F4B86014 : (touch.has-hover ? #FFFFFF08 : #00000000);
+
+    Rectangle {
+        visible: root.selected;
+        x: 0;
+        y: 9px;
+        width: 2px;
+        height: 18px;
+        border-radius: 1px;
+        background: #F4B860;
+    }
+
+    HorizontalLayout {
+        padding-left: 14px;
+        padding-right: 12px;
+
+        Text {
+            text: root.label;
+            color: !root.active ? #5C5F55 : (root.selected ? #F3F1E9 : #A3A69A);
+            font-size: 13px;
+            vertical-alignment: center;
+        }
+
+        Rectangle { }
+
+        Text {
+            visible: !root.active;
+            text: "em breve";
+            color: #5C5F55;
+            font-size: 9px;
+            vertical-alignment: center;
+        }
+    }
+
+    touch := TouchArea {
+        width: parent.width;
+        height: parent.height;
+        enabled: root.active;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}
+
+component SettingsPage inherits Rectangle {
+    in property <string> launcher-version: "0.1.0";
+    in property <string> custom-dll-path: "";
+    in property <bool> dll-valid: false;
+    in property <bool> performance-mode: false;
+    in property <bool> automatic-updates: true;
+    in property <bool> injected: false;
+    callback back();
+    callback pick-dll();
+    callback open-client-folder();
+    callback open-launcher-folder();
+    callback toggle-performance(bool);
+    callback toggle-auto-updates(bool);
+
+    background: #0C0D0B;
+
+    // Left rail
+    Rectangle {
+        x: 0;
+        y: 0;
+        width: 208px;
+        height: parent.height;
+        background: #10120E;
+
+        Rectangle {
+            x: parent.width - 1px;
+            y: 0;
+            width: 1px;
+            height: parent.height;
+            background: #22251E;
+        }
+
+        VerticalLayout {
+            padding: 20px;
+            spacing: 7px;
+
+            MicroLabel { label: "LUMINA"; }
+
+            Text {
+                text: "Configurações";
+                color: #F3F1E9;
+                font-size: 20px;
+                font-family: "Bahnschrift";
+                font-weight: 700;
+            }
+
+            Rectangle { height: 14px; }
+
+            NavButton {
+                label: "Geral";
+                selected: true;
+            }
+
+            NavButton {
+                label: "Versões";
+                active: false;
+            }
+
+            Rectangle { height: 18px; }
+
+            MicroLabel { label: "ATALHOS"; }
+
+            Rectangle { height: 4px; }
+
+            GhostButton {
+                label: "Pasta do cliente";
+                height: 32px;
+                clicked => { root.open-client-folder(); }
+            }
+
+            GhostButton {
+                label: "Pasta do launcher";
+                height: 32px;
+                clicked => { root.open-launcher-folder(); }
+            }
+
+            Rectangle { vertical-stretch: 1; }
+
+            GhostButton {
+                label: "← Voltar";
+                clicked => { root.back(); }
+            }
+
+            Rectangle { height: 8px; }
+
+            Text {
+                text: "v" + root.launcher-version;
+                color: #5C5F55;
+                font-size: 10px;
+            }
+
+            Text {
+                text: "Propriedade da WolfStudios";
+                color: #5C5F55;
+                font-size: 9px;
+                letter-spacing: 0.6px;
+            }
+        }
+    }
+
+    // Content
+    Rectangle {
+        x: 208px;
+        y: 0;
+        width: parent.width - 208px;
+        height: parent.height;
+        background: #0C0D0B;
+
+        VerticalLayout {
+            padding: 20px;
+            spacing: 0px;
+
+            SectionLabel { label: "CONTA"; }
+            Rectangle { height: 10px; }
+
+                HorizontalLayout {
+                    spacing: 12px;
+
+                    Rectangle {
+                        width: 38px;
+                        height: 38px;
+                        border-radius: 19px;
+                        background: #1C1F18;
+                        border-width: 1px;
+                        border-color: #2E3229;
+
+                        Text {
+                            text: "G";
+                            color: #A3A69A;
+                            font-size: 15px;
+                            font-weight: 700;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    VerticalLayout {
+                        spacing: 2px;
+
+                        Text {
+                            text: "Convidado";
+                            color: #E6E5DB;
+                            font-size: 14px;
+                        }
+
+                        Text {
+                            text: "Login chega na próxima versão";
+                            color: #6F7268;
+                            font-size: 11px;
+                        }
+                    }
+
+                    Rectangle { }
+
+                    Rectangle {
+                        width: 58px;
+                        height: 22px;
+                        border-radius: 11px;
+                        border-width: 1px;
+                        border-color: #2E3229;
+                        background: transparent;
+
+                        Text {
+                            text: "GUEST";
+                            color: #85887C;
+                            font-size: 9px;
+                            letter-spacing: 1px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                }
+
+            Rectangle { height: 14px; }
+
+            SectionLabel { label: "LAUNCHER"; }
+            Rectangle { height: 2px; }
+
+                HorizontalLayout {
+                    padding-top: 8px;
+                    padding-bottom: 8px;
+
+                    VerticalLayout {
+                        spacing: 3px;
+
+                        Text {
+                            text: "Atualizações automáticas";
+                            color: #E6E5DB;
+                            font-size: 13px;
+                        }
+
+                        Text {
+                            text: "Aplicar novas versões ao abrir o launcher";
+                            color: #6F7268;
+                            font-size: 11px;
+                        }
+                    }
+
+                    Rectangle { }
+
+                    Rectangle {
+                        width: 42px;
+
+                        Toggle {
+                            y: (parent.height - self.height) / 2;
+                            checked: root.automatic-updates;
+                            accessible-name: "Atualizações automáticas";
+                            toggled => { root.toggle-auto-updates(!root.automatic-updates); }
+                        }
+                    }
+                }
+
+                Hairline { }
+
+                HorizontalLayout {
+                    padding-top: 8px;
+                    padding-bottom: 8px;
+
+                    VerticalLayout {
+                        spacing: 3px;
+
+                        Text {
+                            text: "Modo performance";
+                            color: #E6E5DB;
+                            font-size: 13px;
+                        }
+
+                        Text {
+                            text: "Reduz animações e efeitos visuais";
+                            color: #6F7268;
+                            font-size: 11px;
+                        }
+                    }
+
+                    Rectangle { }
+
+                    Rectangle {
+                        width: 42px;
+
+                        Toggle {
+                            y: (parent.height - self.height) / 2;
+                            checked: root.performance-mode;
+                            accessible-name: "Modo performance";
+                            toggled => { root.toggle-performance(!root.performance-mode); }
+                        }
+                    }
+                }
+
+            Rectangle { height: 14px; }
+
+            SectionLabel { label: "CLIENTE"; }
+            Rectangle { height: 10px; }
+
+            // segmented mode control
+            Rectangle {
+                height: 36px;
+                    border-radius: 10px;
+                    background: #141713;
+                    border-width: 1px;
+                    border-color: #24271F;
+
+                    HorizontalLayout {
+                        padding: 3px;
+                        spacing: 3px;
+
+                        Rectangle {
+                            horizontal-stretch: 1;
+                            border-radius: 7px;
+                            background: #F4B860;
+
+                            Text {
+                                text: "Custom";
+                                color: #12140F;
+                                font-size: 12px;
+                                font-weight: 700;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+
+                        Rectangle {
+                            horizontal-stretch: 1;
+                            border-radius: 7px;
+                            background: transparent;
+
+                            Text {
+                                text: "Release";
+                                color: #5C5F55;
+                                font-size: 12px;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+
+                        Rectangle {
+                            horizontal-stretch: 1;
+                            border-radius: 7px;
+                            background: transparent;
+
+                            Text {
+                                text: "Beta";
+                                color: #5C5F55;
+                                font-size: 12px;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
+                }
+
+            Rectangle { height: 12px; }
+
+            MicroLabel { label: "ARQUIVO DLL"; }
+            Rectangle { height: 6px; }
+
+                HorizontalLayout {
+                    spacing: 8px;
+
+                    Rectangle {
+                        horizontal-stretch: 1;
+                        height: 36px;
+                        border-radius: 10px;
+                        background: #141713;
+                        border-width: 1px;
+                        border-color: #24271F;
+
+                        HorizontalLayout {
+                            padding-left: 12px;
+                            padding-right: 12px;
+
+                            Text {
+                                text: root.custom-dll-path;
+                                color: #B8BAAF;
+                                font-size: 11.5px;
+                                font-family: "Consolas";
+                                vertical-alignment: center;
+                                overflow: elide;
+                            }
+                        }
+                    }
+
+                    PrimaryButton {
+                        width: 100px;
+                        label: "Escolher";
+                        clicked => { root.pick-dll(); }
+                    }
+                }
+
+            Rectangle { height: 8px; }
+
+            HorizontalLayout {
+                spacing: 8px;
+
+                Text {
+                    text: "●";
+                    color: root.dll-valid ? #9ED67C : #E07A5F;
+                        font-size: 8px;
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        text: root.dll-valid ? "DLL válida" : "DLL não encontrada";
+                        color: root.dll-valid ? #A9C79A : #C98B78;
+                        font-size: 11px;
+                        vertical-alignment: center;
+                    }
+
+                    Rectangle { }
+
+                    Text {
+                        text: root.injected ? "Cliente injetado" : "Cliente não injetado";
+                        color: root.injected ? #A9C79A : #6F7268;
+                        font-size: 11px;
+                        vertical-alignment: center;
+                    }
+                }
+
+            }
+        }
+    }
+
+component DialogCard inherits Rectangle {
+    in property <string> title: "";
+    in property <string> message: "";
+    in property <string> primary-label: "OK";
+    in property <string> secondary-label: "";
+    callback primary();
+    callback secondary();
+
+    width: 440px;
+    height: 208px;
+    border-radius: 16px;
+    background: #171A15;
+    border-width: 1px;
+    border-color: #2E3229;
+
+    VerticalLayout {
+        padding: 22px;
+        spacing: 12px;
+
+        MicroLabel { label: "AVISO"; }
+
+        Text {
+            text: root.title;
+            color: #F3F1E9;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        Text {
+            text: root.message;
+            color: #A3A69A;
+            font-size: 13px;
+            wrap: word-wrap;
+            vertical-stretch: 1;
+        }
+
+        HorizontalLayout {
+            alignment: end;
+            spacing: 8px;
+
+            if root.secondary-label != "" : GhostButton {
+                width: 112px;
+                label: root.secondary-label;
+                clicked => { root.secondary(); }
+            }
+
+            PrimaryButton {
+                width: 124px;
+                label: root.primary-label;
+                clicked => { root.primary(); }
+            }
+        }
+    }
+}
+
+export component AppWindow inherits Window {
+    in property <string> launcher-version: "0.1.0";
+    in property <string> status: "Preparando...";
+    in property <string> game-version: "0.0.0";
+    in property <bool> game-installed: false;
+    in property <bool> game-supported: false;
+    in property <bool> busy: false;
+    in property <bool> injected: false;
+    in property <bool> dll-valid: false;
+    in property <bool> settings-open: false;
+    in property <bool> performance-mode: false;
+    in property <bool> automatic-updates: true;
+    in property <string> custom-dll-path: "";
+    in property <bool> dialog-visible: false;
+    in property <string> dialog-title: "";
+    in property <string> dialog-message: "";
+    in property <string> dialog-primary: "OK";
+    in property <string> dialog-secondary: "";
+
+    callback launch();
+    callback open-settings();
+    callback close-settings();
+    callback pick-dll();
+    callback open-client-folder();
+    callback open-launcher-folder();
+    callback minimize();
+    callback close-window();
+    callback start-drag();
+    callback toggle-performance(bool);
+    callback toggle-auto-updates(bool);
+    callback dialog-primary-clicked();
+    callback dialog-secondary-clicked();
+
+    title: "Lumina Launcher - WolfStudios";
+    width: 800px;
+    height: 500px;
+    no-frame: true;
+    background: #0C0D0B;
+
+    Rectangle {
+        width: parent.width;
+        height: parent.height;
+        clip: true;
+        border-width: 1px;
+        border-color: #22251E;
+        background: #0C0D0B;
+
+        TitleBar {
+            x: 0;
+            y: 0;
+            width: parent.width;
+            height: 52px;
+            app-name: "Lumina Launcher";
+            start-drag => { root.start-drag(); }
+            minimize => { root.minimize(); }
+            close-window => { root.close-window(); }
+        }
+
+        HomePage {
+            x: 0;
+            y: 52px;
+            width: parent.width;
+            height: parent.height - 52px;
+            visible: !root.settings-open;
+            status: root.status;
+            game-version: root.game-version;
+            game-installed: root.game-installed;
+            game-supported: root.game-supported;
+            launcher-version: root.launcher-version;
+            busy: root.busy;
+            injected: root.injected;
+            dll-valid: root.dll-valid;
+            launch => { root.launch(); }
+            open-settings => { root.open-settings(); }
+        }
+
+        SettingsPage {
+            x: 0;
+            y: 52px;
+            width: parent.width;
+            height: parent.height - 52px;
+            visible: root.settings-open;
+            launcher-version: root.launcher-version;
+            custom-dll-path: root.custom-dll-path;
+            dll-valid: root.dll-valid;
+            performance-mode: root.performance-mode;
+            automatic-updates: root.automatic-updates;
+            injected: root.injected;
+            back => { root.close-settings(); }
+            pick-dll => { root.pick-dll(); }
+            open-client-folder => { root.open-client-folder(); }
+            open-launcher-folder => { root.open-launcher-folder(); }
+            toggle-performance(value) => { root.toggle-performance(value); }
+            toggle-auto-updates(value) => { root.toggle-auto-updates(value); }
+        }
+
+        Rectangle {
+            x: 0;
+            y: 0;
+            width: parent.width;
+            height: parent.height;
+            background: #000000B0;
+            visible: root.dialog-visible;
+
+            DialogCard {
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+                title: root.dialog-title;
+                message: root.dialog-message;
+                primary-label: root.dialog-primary;
+                secondary-label: root.dialog-secondary;
+                primary => { root.dialog-primary-clicked(); }
+                secondary => { root.dialog-secondary-clicked(); }
+            }
+        }
+    }
+}
